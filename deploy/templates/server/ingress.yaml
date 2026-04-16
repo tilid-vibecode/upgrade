@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-api
+  labels:
+    app.kubernetes.io/name: mula-server
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: mula-ai
+    app.kubernetes.io/component: server
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ .Values.server.tag | quote }}
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-http01
+    # SSE / streaming support — keep connections alive for long-running streams
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    # File uploads
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    # CORS — allow cross-origin from frontend domain
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://{{ .Values.client.hostname }}"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Authorization,Content-Type,Accept,Origin,X-Requested-With"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{ .Values.server.hostname }}
+      secretName: api-{{ .Values.environment }}-certificate
+  rules:
+    - host: {{ .Values.server.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-server
+                port:
+                  name: http

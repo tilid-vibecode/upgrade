@@ -1,0 +1,144 @@
+Логин,Имя,Роль,Подразделение,Лид подразделения,Проекты
+as,Александр Соколов,CEO,Руководство,Да — CEO,Sales; Meridian Workflows; HR Recruitment; Мониторг; Newsletter; RU-AM
+abe,Александра Белова,Manager,Управление проектами,,Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs
+ani,Анна Никишина,Manager,Управление проектами,,Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway; Horizon SDK
+ao,Александр Орлов,Manager,Управление проектами,,Quartz Portal; Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding
+ds,Денис Смирнов,Manager,Управление проектами,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+oa,Олег Андреев,Manager,Управление проектами,,Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM
+ti,Татьяна Иванова,PM; Manager,Управление проектами,,Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway; Horizon SDK
+lr,Людмила Рябова,PM,Продукт,,RU-AM; Orion Passbook; Мониторг; System Administration; Meridian Workflows
+vfe,Валерия Фёдорова,PM,Продукт,,Мониторг; Meridian Workflows; Newsletter; Sales
+yt,Юлия Тихонова,PM,Продукт,Да,Meridian Workflows; Knowledge Base; Owork; HR Team; HR Recruitment; Orion Passbook; Orion Bot Insurance
+nsh,Наталья Шевцова,PM,Продукт,,Sales; Meridian Workflows; Newsletter
+em,Елена Морозова,PM,Продукт,,RU-AM; Meridian Workflows; Sales; Newsletter
+dp,Денис Попов,PM,Продукт,,Sales; Meridian Workflows
+az,Андрей Захаров,PM; Markup,Продукт,,Orion Passbook; Orion Bot Insurance; Meridian Workflows; Newsletter
+vby,Виктория Быкова,PM,Продукт,,Meridian Workflows
+rk,Роман Козлов,PM,Продукт,,RU-AM; Meridian Workflows
+iko,Ирина Комарова,PM,Продукт,,Meridian Workflows
+ek,Екатерина Крылова,PM,Продукт,,Relay Core; Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments
+et,Елена Тимофеева,PM,Продукт,,Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync; Atlas Platform
+kb,Кирилл Белоусов,PM,Продукт,,Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal
+mk,Михаил Казаков,PM,Продукт,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+mly,Михаил Лыков,PM,Продукт,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+ns,Николай Семёнов,PM,Продукт,,Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM
+oy,Олег Яковлев,PM,Продукт,,Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM
+re,Роман Ефимов,PM,Продукт,,Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync; Atlas Platform
+vd,Вера Дмитриева,PM,Продукт,,Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal; Vega Mobile
+ya,Яна Андреева,PM,Продукт,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+ago,Андрей Голубев,PM,Продукт,,Relay Core; Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments
+ale,Алина Леонтьева,PM,Продукт,,Prism Data; Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core
+aol,Алина Олейникова,PM,Продукт,,Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API
+asa,Анастасия Сазонова,PM,Продукт,,Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler
+dma,Дарья Мартынова,PM,Продукт,,Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync; Atlas Platform
+ib,Иван Борисов,PM,Продукт,,Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding; Prism Data
+ku,Константин Уваров,PM,Продукт,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+amu,Александр Мухин,IPM,Продукт,,Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline
+ev,Евгений Власов,MAPR,Продукт,,Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync; Atlas Platform
+pk,Павел Корнилов,FM; PM,Продукт,,Meridian Workflows
+oby,Ольга Быкова,AM,Продукт,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+am,Артём Матвеев,Backend,Бэкенд-разработка,,Meridian Workflows; Owork; RU-AM
+aper,Артём Першин,Backend,Бэкенд-разработка,,Мониторг; RU-AM
+sr,Сергей Романов,Backend,Бэкенд-разработка,,Prism Data; Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core
+tm,Тимур Минаев,Backend,Бэкенд-разработка,,Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler
+mki,Максим Кириллов,Backend,Бэкенд-разработка,,Мониторг; Owork
+dsh,Дмитрий Шишкин,Backend,Бэкенд-разработка,Да,RU-AM; Orion Bot Insurance
+dr,Дмитрий Рыбаков,Backend,Бэкенд-разработка,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+dt,Денис Тарасов,Backend,Бэкенд-разработка,,Amber Search; Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard
+id,Илья Дмитриев,Backend,Бэкенд-разработка,,Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway
+it,Илья Тарасов,Backend,Бэкенд-разработка,,Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding; Prism Data
+its,Иван Тарасов,Backend,Бэкенд-разработка,,Relay Core; Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments
+nib,Никита Ибрагимов,Backend,Бэкенд-разработка,,Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway
+nk,Николай Кузнецов,Backend,Бэкенд-разработка,,Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler
+ps,Пётр Степанов,Backend,Бэкенд-разработка,,Ember Design System; Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD
+rb,Роман Белоусов,Backend,Бэкенд-разработка,,Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal; Vega Mobile
+sk,Сергей Карпов,Backend,Бэкенд-разработка,,Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler
+so,Степан Осипов,Backend,Бэкенд-разработка,,Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline
+vm,Владимир Морозов,Backend,Бэкенд-разработка,,Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs
+vr,Виктор Романов,Backend,Бэкенд-разработка,,Amber Search; Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard
+vs,Владимир Степанов,Backend,Бэкенд-разработка,,Carbon Pipeline; Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync
+vsh,Виталий Шишкин,Backend,Бэкенд-разработка,,Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding; Prism Data
+vv,Виктор Волков,Backend,Бэкенд-разработка,,Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway
+vvo,Виталий Воронов,Backend,Бэкенд-разработка,,Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs
+af,Александр Фомин,Backend,Бэкенд-разработка,,Quartz Portal; Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding
+ag,Алексей Герасимов,Backend,Бэкенд-разработка,,Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal; Vega Mobile
+at,Антон Тарасов,Backend,Бэкенд-разработка,,Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API
+abo,Артём Бобров,Backend; Design; Office,Бэкенд-разработка,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+abor,Алина Борисова,Backend,Бэкенд-разработка,,Amber Search; Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard
+ac,Андрей Чернов,Backend; QA,Бэкенд-разработка,,Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway; Horizon SDK
+ipa,Ирина Панова,Backend,Бэкенд-разработка,,Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal
+asu,Анастасия Субботина,Frontend,Фронтенд-разработка,,Meridian Workflows; RU-AM
+ash,Андрей Шалимов,Frontend,Фронтенд-разработка,Да,RU-AM; Meridian Workflows; Мониторг
+ide,Иван Денисов,Frontend,Фронтенд-разработка,,RU-AM; Мониторг; Newsletter; Open Source
+ey,Елена Яковлева,Frontend,Фронтенд-разработка,,RU-AM; Мониторг
+nko,Николай Кожевников,Frontend,Фронтенд-разработка,,RU-AM
+apog,Алексей Погодин,Frontend,Фронтенд-разработка,,Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline
+an,Антон Никитин,Frontend,Фронтенд-разработка,,Relay Core; Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments
+aka,Алина Каменева,Frontend,Фронтенд-разработка,,Ember Design System; Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD
+amat,Александр Матинов,Frontend,Фронтенд-разработка,,Amber Search; Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard
+aar,Анна Артёмова,Frontend,Фронтенд-разработка,,Pulse Analytics; Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System
+asub,Алексей Субботин,Frontend,Фронтенд-разработка,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+ii,Иван Иванов,Frontend,Фронтенд-разработка,,RU-AM
+ng,Никита Герасимов,Frontend,Фронтенд-разработка,,Pulse Analytics; Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System
+if,Иван Фролов,Frontend,Фронтенд-разработка,,Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API
+yv,Юрий Власов,Frontend,Фронтенд-разработка,,Open Source
+ase,Александр Серёгин,Frontend,Фронтенд-разработка,,Quartz Portal; Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding
+vz,Виктор Захаров,Frontend,Фронтенд-разработка,,Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics
+ap,Алексей Панков,Frontend,Фронтенд-разработка,,Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal
+ni,Никита Иванов,Frontend,Фронтенд-разработка,,Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics
+asav,Анастасия Савина,Frontend,Фронтенд-разработка,,Open Source
+ia,Иван Андреев,Frontend,Фронтенд-разработка,,Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway
+gm,Галина Морозова,Frontend,Фронтенд-разработка,,Relay Core; Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments
+gs,Григорий Соколов,Frontend,Фронтенд-разработка,,Newsletter
+asc,Александра Скворцова,Frontend,Фронтенд-разработка,,Pulse Analytics; Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System
+pg,Пётр Горелов,Frontend,Фронтенд-разработка,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+vk,Виктор Кузнецов,Frontend,Фронтенд-разработка,,Ember Design System; Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD
+esa,Екатерина Сазонова,QA,Тестирование / QA,Да,Мониторг; RU-AM; Meridian Workflows
+bv,Борис Виноградов,QA,Тестирование / QA,,Zephyr Auth; Carbon Pipeline; Flux Scheduler; Amber Search; Indigo Events
+azi,Александр Зимин,QA,Тестирование / QA,,Zephyr Auth; Carbon Pipeline; Flux Scheduler; Amber Search; Indigo Events
+mn,Максим Назаров,QA,Тестирование / QA,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+nsc,Наталья Смирнова,QA,Тестирование / QA,,Ember Design System; Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD
+ou,Ольга Ушакова,QA,Тестирование / QA,,RU-AM
+vb,Виктор Борисов,QA,Тестирование / QA,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+mb,Мария Белова,QA,Тестирование / QA,,Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway
+asl,Анастасия Слободина,Tester,Тестирование / QA,,Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API
+asli,Александра Слонова,QA,Тестирование / QA,,Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler; Amber Search
+mv,Михаил Власов,Tester,Тестирование / QA,,Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler
+ab,Анна Белова,UI,Дизайн,,Meridian Workflows; RU-AM; Мониторг
+ama,Александра Макарова,UI,Дизайн,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+ame,Анна Мелехова,UI,Дизайн,,Relay Core; Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments
+apa,Анастасия Панова,UI,Дизайн,,Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding; Prism Data
+ape,Александра Петрова,UI,Дизайн,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+apo,Андрей Понизов,UI,Дизайн,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+est,Елена Столярова,UI,Дизайн,,Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync; Atlas Platform
+ik,Игорь Кириллов,UI,Дизайн,,Vega Mobile; Ember Design System; Slate Reports; Nova Onboarding; Prism Data
+ke,Ксения Ефремова,UI,Дизайн,,Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM
+ml,Мария Лебедева,UI,Дизайн,,Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications; Beacon Alpha
+sm,Светлана Морозова,UI,Дизайн,,Prism Data; Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core
+dm,Дмитрий Матвеев,UX,Дизайн,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+al,Анна Лебедева,UX,Дизайн,,Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline
+iz,Ирина Захарова,UX,Дизайн,,Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway
+ls,Лариса Самойлова,Design,Дизайн,Да,Amber Search; Indigo Events; Cobalt Sync; Atlas Platform; Helios Dashboard
+sz,Сергей Захаров,Prototype,Дизайн,,Carbon Pipeline; Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync
+aa,Анна Андреева,Markup,Контент и Маркетинг,,Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs
+kf,Кирилл Фомин,Markup,Контент и Маркетинг,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+ob,Олег Борисов,Markup,Контент и Маркетинг,,Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal
+pd,Пётр Долгов,Markup,Контент и Маркетинг,,Ember Design System; Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD
+sn,Сергей Никитин,Markup,Контент и Маркетинг,,Cobalt CRM; Quartz Portal; Vega Mobile; Ember Design System; Slate Reports
+vba,Виктор Батурин,Markup,Контент и Маркетинг,,Beacon Alpha; Relay Core; Vault Docs; Sigma Gateway; Horizon SDK
+akar,Антон Карпов,SMM,Контент и Маркетинг,,Forge CI/CD; Ionic Notifications; Beacon Alpha; Relay Core; Vault Docs
+gk,Григорий Кузьмин,PR,Контент и Маркетинг,Да,Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth; Carbon Pipeline
+ad,Анна Данилова,HR,HR,Да,Owork; HR Team; HR Recruitment; Meridian Workflows; Legal; Мониторг; Newsletter
+ako,Андрей Козлов,HR,HR,,HR Team; HR Recruitment; Meridian Workflows; Newsletter
+vf,Вера Фролова,Office,Офис и Администрация,Да,Owork; Мониторг; Knowledge Base; Newsletter; Meridian Workflows; HR Team
+om,Ольга Матвеева,Office,Офис и Администрация,,Owork; Мониторг; Sales; HR Team; Legal; Newsletter
+es,Елена Степанова,Office,Офис и Администрация,,Zephyr Auth; Carbon Pipeline; Flux Scheduler; Amber Search; Indigo Events
+nf,Наталья Фёдорова,Office,Офис и Администрация,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+asy,Анна Сыромятникова,Office,Офис и Администрация,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+ekh,Екатерина Хромова,Office,Офис и Администрация,,Slate Reports; Nova Onboarding; Prism Data; Forge CI/CD; Ionic Notifications
+ach,Алексей Чернов,Admin,Офис и Администрация,,Meridian Workflows; System Administration; Мониторг; Knowledge Base
+pn,Павел Никитин,Admin,Офис и Администрация,,Lynx Payments; Zephyr Auth; Carbon Pipeline; Flux Scheduler; Amber Search
+sf,Светлана Фёдорова,Sales,Продажи и Бизнес-развитие,,Cobalt Sync; Atlas Platform; Helios Dashboard; Nexus API; Pulse Analytics
+vi,Виктор Иванов,Sales,Продажи и Бизнес-развитие,,Helios Dashboard; Nexus API; Pulse Analytics; Cobalt CRM; Quartz Portal
+apl,Алексей Плотников,Sales,Продажи и Бизнес-развитие,,Vault Docs; Sigma Gateway; Horizon SDK; Lynx Payments; Zephyr Auth
+ga,Григорий Андреев,BizDev,Продажи и Бизнес-развитие,Да,Carbon Pipeline; Flux Scheduler; Amber Search; Indigo Events; Cobalt Sync

@@ -1,0 +1,69 @@
+environment: staging
+
+server:
+  hostname: "api-staging.mula.page"
+  replicaCount: 2
+  gunicornWorkers: 4
+  redisPoolMax: "200"
+  environment:
+    SENTRY_TRACES_SAMPLE_RATE: "1.0"
+    SENTRY_PROFILES_SAMPLE_RATE: "1.0"
+  observability:
+    enabled: true
+    otel:
+      auth_token:
+        enabled: true
+  probes:
+    enabled: true
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+worker:
+  enabled: true
+  replicaCount: 2
+  processes: 2
+  threads: 8
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+
+scheduler:
+  enabled: true
+  tickSeconds: 5
+  leaderTtlSeconds: 30
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  livenessProbe:
+    enabled: true
+
+client:
+  hostname: "staging.mula.page"
+  replicaCount: 1
+
+minio:
+  enabled: true
+  persistence:
+    size: 50Gi
+
+queue:
+  enabled: true
+  type: redis

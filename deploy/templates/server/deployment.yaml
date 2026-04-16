@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-server
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mula-server
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mula-server
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/part-of: mula-ai
+        app.kubernetes.io/component: web
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: {{ .Values.server.tag | quote }}
+      annotations:
+        deploy/tag: {{ .Values.server.tag | quote }}
+        deploy/commit: {{ default "" .Values.server.commitSha | quote }}
+    spec:
+      {{- if eq .Values.environment "staging" }}
+      tolerations:
+        - key: "eks.amazonaws.com/capacityType"
+          operator: "Equal"
+          value: "SPOT"
+          effect: "NoSchedule"
+      {{- end }}
+      volumes:
+        - name: static-files
+          emptyDir:
+            sizeLimit: 1Gi
+      containers:
+        - name: server
+          image: "{{ .Values.registry }}/{{ .Values.server.image }}:{{ .Values.server.tag }}"
+          imagePullPolicy: {{ .Values.server.pullPolicy }}
+          ports:
+            - containerPort: 8000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-server-config
+            - secretRef:
+                name: {{ .Release.Name }}-server-secrets
+            {{- if .Values.queue.enabled }}
+            {{- if eq .Values.queue.type "redis" }}
+            - secretRef:
+                name: redis-auth
+            {{- end }}
+            {{- end }}
+          env:
+            - name: SERVICE
+              value: "web"
+            - name: SERVICE_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/version']
+            - name: SENTRY_RELEASE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/version']
+            # Gunicorn workers per pod — each worker is a full async event loop
+            - name: WEB_WORKERS
+              value: {{ .Values.server.gunicornWorkers | default "4" | quote }}
+            - name: WEB_TIMEOUT
+              value: "3600"
+            - name: WEB_KEEPALIVE
+              value: "120"
+            {{- if .Values.minio.enabled }}
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.minio.auth.secretName }}
+                  key: {{ .Values.minio.auth.accessKeyRef }}
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.minio.auth.secretName }}
+                  key: {{ .Values.minio.auth.secretKeyRef }}
+            {{- end }}
+            {{- if .Values.server.observability.enabled }}
+            - name: OTEL_ENABLE
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.server.observability.otel.service_name | default "mula-server" }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.server.observability.otel.exporter_otlp_endpoint | default "" }}
+            {{- if .Values.server.observability.otel.auth_token.enabled }}
+            - name: OTEL_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.server.observability.otel.auth_token.secret_name }}
+                  key: {{ .Values.server.observability.otel.auth_token.secret_key }}
+            {{- end }}
+            - name: LOG_LEVEL
+              value: {{ .Values.server.observability.otel.log_level | default "INFO" | quote }}
+            - name: ENABLE_JSON_LOGGING
+              value: {{ ternary "true" "false" .Values.server.observability.otel.enable_json_logging | quote }}
+            {{- end }}
+          {{- if .Values.server.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.server.probes.liveness.path }}
+              port: {{ .Values.server.probes.liveness.port }}
+            initialDelaySeconds: {{ .Values.server.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.server.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.server.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.server.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.server.probes.readiness.path }}
+              port: {{ .Values.server.probes.readiness.port }}
+            initialDelaySeconds: {{ .Values.server.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.server.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.server.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.server.probes.readiness.failureThreshold }}
+          {{- end }}
+          {{- with .Values.server.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /app/static
+              name: static-files

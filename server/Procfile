@@ -1,0 +1,4 @@
+web: bash ./scripts/run-web.sh
+worker: python -m dramatiq server.broker --processes 1 --threads 4
+scheduler: python manage.py run_scheduler
+qdrant: bash ./scripts/run-qdrant.sh

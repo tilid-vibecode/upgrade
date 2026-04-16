@@ -1,0 +1,21 @@
+{{- if and .Values.minio.enabled .Values.minio.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-minio-data
+  labels:
+    app.kubernetes.io/name: mula-minio
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: mula-ai
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/managed-by: Helm
+spec:
+  accessModes:
+    - {{ .Values.minio.persistence.accessMode }}
+  {{- if .Values.minio.persistence.storageClass }}
+  storageClassName: {{ .Values.minio.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.minio.persistence.size }}
+{{- end }}

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-server-config
+  labels:
+    app.kubernetes.io/name: mula-server
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: mula-ai
+    app.kubernetes.io/component: server
+    app.kubernetes.io/managed-by: Helm
+data:
+  {{- range $key, $val := .Values.server.environment }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  DJANGO_ENVIRONMENT: {{ .Values.environment | quote }}
+  SENTRY_ENVIRONMENT: {{ .Values.environment | quote }}
+  # CORS — frontend is on a different domain, must allow cross-origin
+  CORS_ALLOWED_ORIGINS: "https://{{ .Values.client.hostname }}"
+  {{- if .Values.queue.enabled }}
+  {{- if eq .Values.queue.type "redis" }}
+  REDIS_IS_CRITICAL: "true"
+  {{- end }}
+  {{- end }}
+  # Redis pool — sized for SSE streams + pub/sub + Dramatiq broker
+  # Each SSE connection holds a Redis subscription, so pool must be large enough
+  # for all concurrent streams across all server pods
+  REDIS_POOL_MAX: {{ .Values.server.redisPoolMax | default "200" | quote }}
+  {{- if .Values.minio.enabled }}
+  ACTIVE_S3_BACKEND: "minio_local"
+  ACTIVE_MEDIA_BACKEND: "minio_local"
+  MINIO_ENDPOINT: "{{ .Release.Name }}-minio:9000"
+  MINIO_SECURE: "false"
+  {{- end }}

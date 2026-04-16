@@ -1,0 +1,13 @@
+server:
+  tag: local
+  pullPolicy: IfNotPresent
+
+worker:
+  enabled: false
+
+client:
+  tag: local
+  pullPolicy: IfNotPresent
+
+minio:
+  enabled: false

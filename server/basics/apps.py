@@ -1,0 +1,7 @@
+# File location: /server/basics/apps.py
+from django.apps import AppConfig
+
+
+class BasicsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'basics'

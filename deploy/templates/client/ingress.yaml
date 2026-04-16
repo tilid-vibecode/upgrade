@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-portal
+  labels:
+    app.kubernetes.io/name: mula-client
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: mula-ai
+    app.kubernetes.io/component: client
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: {{ .Values.client.tag | quote }}
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-http01
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{ .Values.client.hostname }}
+      secretName: portal-{{ .Values.environment }}-certificate
+  rules:
+    - host: {{ .Values.client.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-client
+                port:
+                  name: http

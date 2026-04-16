@@ -1,0 +1,361 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}LLM Usage Dashboard{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  .dashboard-wrapper { padding: 20px; }
+  .filters-bar {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    padding: 16px; margin-bottom: 24px;
+    background: #f8f9fa; border-radius: 8px; border: 1px solid #ddd;
+    align-items: flex-end;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #666; }
+  .filter-group select, .filter-group input {
+    padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;
+    font-size: 13px; min-width: 140px;
+  }
+  .btn-refresh {
+    padding: 6px 16px; background: #417690; color: white;
+    border: none; border-radius: 4px; cursor: pointer; font-size: 13px;
+    align-self: flex-end;
+  }
+  .btn-refresh:hover { background: #205067; }
+
+  .totals-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .total-card {
+    padding: 16px; background: white; border-radius: 8px;
+    border: 1px solid #ddd; text-align: center;
+  }
+  .total-card .value { font-size: 28px; font-weight: 700; color: #333; }
+  .total-card .label { font-size: 12px; color: #888; margin-top: 4px; }
+
+  .charts-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px; margin-bottom: 24px;
+  }
+  .chart-card {
+    padding: 16px; background: white; border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  .chart-card.full-width { grid-column: 1 / -1; }
+  .chart-card h3 { margin: 0 0 12px 0; font-size: 15px; color: #333; }
+  .chart-container { position: relative; height: 320px; }
+  .chart-card.full-width .chart-container { height: 400px; }
+
+  .loading-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.7); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 18px; z-index: 999; display: none;
+  }
+
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Organization</label>
+      <select id="filter-org">
+        <option value="">All Organizations</option>
+        {% for org in org_uuids %}
+        <option value="{{ org }}">{{ org|truncatechars:20 }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Provider</label>
+      <select id="filter-provider">
+        <option value="">All Providers</option>
+        {% for p in providers %}
+        <option value="{{ p }}">{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Model</label>
+      <select id="filter-model">
+        <option value="">All Models</option>
+        {% for m in models_used %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Time Range</label>
+      <select id="filter-days">
+        <option value="7">Last 7 days</option>
+        <option value="14">Last 14 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="180">Last 180 days</option>
+        <option value="365">Last year</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Granularity</label>
+      <select id="filter-granularity">
+        <option value="daily" selected>Daily</option>
+        <option value="hourly">Hourly</option>
+      </select>
+    </div>
+    <button class="btn-refresh" onclick="loadDashboard()">Refresh</button>
+  </div>
+
+  <div class="totals-row">
+    <div class="total-card">
+      <div class="value" id="total-calls">-</div>
+      <div class="label">Total API Calls</div>
+    </div>
+    <div class="total-card">
+      <div class="value" id="total-tokens">-</div>
+      <div class="label">Total Tokens</div>
+    </div>
+    <div class="total-card">
+      <div class="value" id="total-cost">-</div>
+      <div class="label">Estimated Cost</div>
+    </div>
+    <div class="total-card">
+      <div class="value" id="total-success-rate">-</div>
+      <div class="label">Success Rate</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card full-width">
+      <h3>Token Usage Over Time (by Model)</h3>
+      <div class="chart-container"><canvas id="chart-timeseries"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Cost by Model</h3>
+      <div class="chart-container"><canvas id="chart-by-model"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Call Type Distribution</h3>
+      <div class="chart-container"><canvas id="chart-call-types"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top Organizations by Cost</h3>
+      <div class="chart-container"><canvas id="chart-top-orgs"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top Users by Tokens</h3>
+      <div class="chart-container"><canvas id="chart-top-users"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loading">Loading dashboard data…</div>
+
+<script>
+const COLORS = [
+  '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+  '#59a14f', '#edc948', '#b07aa1', '#ff9da7',
+  '#9c755f', '#bab0ac',
+];
+
+let charts = {};
+
+function getFilter(id) {
+  return document.getElementById(id).value;
+}
+
+function fmt(n) {
+  if (n === null || n === undefined) return '-';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+function destroyChart(key) {
+  if (charts[key]) { charts[key].destroy(); delete charts[key]; }
+}
+
+function buildTimeSeries(data) {
+  destroyChart('ts');
+  const byModel = {};
+  data.forEach(r => {
+    if (!byModel[r.model]) byModel[r.model] = [];
+    byModel[r.model].push({ x: r.period, y: r.tokens });
+  });
+
+  const datasets = Object.entries(byModel).map(([model, points], i) => ({
+    label: model,
+    data: points,
+    borderColor: COLORS[i % COLORS.length],
+    backgroundColor: COLORS[i % COLORS.length] + '22',
+    fill: true, tension: 0.3, pointRadius: 2,
+  }));
+
+  charts.ts = new Chart(document.getElementById('chart-timeseries'), {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { type: 'category', title: { display: true, text: 'Period' } },
+        y: { title: { display: true, text: 'Tokens' }, beginAtZero: true },
+      },
+      plugins: { legend: { position: 'top' } },
+    }
+  });
+}
+
+function buildByModel(data) {
+  destroyChart('model');
+  charts.model = new Chart(document.getElementById('chart-by-model'), {
+    type: 'doughnut',
+    data: {
+      labels: data.map(r => r.model),
+      datasets: [{
+        data: data.map(r => r.cost_usd),
+        backgroundColor: data.map((_, i) => COLORS[i % COLORS.length]),
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right' },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.label}: $${ctx.parsed.toFixed(2)} (${fmt(data[ctx.dataIndex].tokens)} tokens)`
+          }
+        }
+      },
+    }
+  });
+}
+
+function buildCallTypes(data) {
+  destroyChart('ct');
+  const CALL_TYPE_LABELS = {
+    completion: 'Completion',
+    tool_call: 'Tool Call',
+    tool_followup: 'Tool Follow-up',
+    validation_retry: 'Validation Retry',
+    iteration_retry: 'Iteration Retry',
+  };
+  charts.ct = new Chart(document.getElementById('chart-call-types'), {
+    type: 'doughnut',
+    data: {
+      labels: data.map(r => CALL_TYPE_LABELS[r.call_type] || r.call_type),
+      datasets: [{
+        data: data.map(r => r.count),
+        backgroundColor: data.map((_, i) => COLORS[i % COLORS.length]),
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right' } },
+    }
+  });
+}
+
+function buildTopOrgs(data) {
+  destroyChart('orgs');
+  charts.orgs = new Chart(document.getElementById('chart-top-orgs'), {
+    type: 'bar',
+    data: {
+      labels: data.map(r => r.organization_uuid.slice(0, 8) + '…'),
+      datasets: [{
+        label: 'Cost (USD)',
+        data: data.map(r => r.cost_usd),
+        backgroundColor: COLORS[0],
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: 'USD' } } },
+    }
+  });
+}
+
+function buildTopUsers(data) {
+  destroyChart('users');
+  if (!data.length) {
+    const ctx = document.getElementById('chart-top-users').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#999';
+    ctx.fillText('Select an organization to see user breakdown', 20, 50);
+    return;
+  }
+  charts.users = new Chart(document.getElementById('chart-top-users'), {
+    type: 'bar',
+    data: {
+      labels: data.map(r => r.user_uuid.slice(0, 8) + '…'),
+      datasets: [{
+        label: 'Tokens',
+        data: data.map(r => r.tokens),
+        backgroundColor: COLORS[1],
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: 'Tokens' } } },
+    }
+  });
+}
+
+async function loadDashboard() {
+  const el = document.getElementById('loading');
+  el.style.display = 'flex';
+
+  const params = new URLSearchParams({
+    org: getFilter('filter-org'),
+    provider: getFilter('filter-provider'),
+    model: getFilter('filter-model'),
+    days: getFilter('filter-days'),
+    granularity: getFilter('filter-granularity'),
+  });
+
+  try {
+    const resp = await fetch(`/admin/llm_usage/dashboard/data/?${params}`);
+    const data = await resp.json();
+
+    // Totals
+    const t = data.totals;
+    document.getElementById('total-calls').textContent = fmt(t.total_calls);
+    document.getElementById('total-tokens').textContent = fmt(t.total_tokens);
+    document.getElementById('total-cost').textContent = '$' + (t.total_cost_usd || 0).toFixed(2);
+    const successRate = t.total_calls
+      ? ((t.total_success / t.total_calls) * 100).toFixed(1) + '%'
+      : '-';
+    document.getElementById('total-success-rate').textContent = successRate;
+
+    // Charts
+    buildTimeSeries(data.time_series);
+    buildByModel(data.by_model);
+    buildCallTypes(data.by_call_type);
+    buildTopOrgs(data.top_orgs);
+    buildTopUsers(data.top_users);
+
+  } catch (err) {
+    console.error('Dashboard load error:', err);
+  } finally {
+    el.style.display = 'none';
+  }
+}
+
+// Load on page ready
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+{% endblock %}

@@ -1,0 +1,221 @@
+# =============================================================================
+# Mula AI — Helm Values (defaults / development)
+# =============================================================================
+#
+# ARCHITECTURE OVERVIEW
+# =====================
+# The system has three process types that must be balanced:
+#
+# 1. SERVER PODS (FastAPI + Gunicorn/UvicornWorker)
+#    - Handle HTTP requests (POST message, list messages)
+#    - Hold long-lived SSE stream connections
+#    - Each SSE stream = 1 HTTP connection + 1 Redis pub/sub subscription
+#    - Bottleneck: concurrent SSE connections (not CPU)
+#    - Scale based on: connection count
+#
+# 2. WORKER PODS (Dramatiq via same Docker image, SERVICE=worker)
+#    - Pick tasks from Redis broker queue
+#    - Heavy I/O processing (LLM calls, embeddings, DB writes)
+#    - Publish results to Redis pub/sub when done
+#    - Bottleneck: CPU and I/O wait
+#    - Scale based on: CPU utilisation and queue depth
+#
+# 3. SCHEDULER POD (management command via same Docker image, SERVICE=scheduler)
+#    - Single-instance leader-elected process
+#    - Reads due ScheduledTask rows from PostgreSQL every tick
+#    - Dispatches Dramatiq messages → workers execute the actual work
+#    - Bottleneck: nothing (lightweight loop)
+#    - Always 1 replica — leader lock handles rolling updates
+#
+# Redis is the glue between them:
+#   - Dramatiq broker (task queue): worker picks up tasks
+#   - Pub/sub channels: worker publishes results, server SSE streams listen
+#   - Scheduler leader lock: prevents duplicate dispatches
+#   - This means POST and SSE can land on DIFFERENT server pods — it works
+#     because every server pod subscribes to Redis pub/sub
+#
+# External services (Redis, PostgreSQL, Qdrant, Grafana) live OUTSIDE K8s.
+# =============================================================================
+
+environment: development
+registry: 123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+# ---------------------------------------------------------------------------
+# Server (Django + FastAPI) — handles HTTP + SSE streams
+# ---------------------------------------------------------------------------
+server:
+  hostname: ""
+  replicaCount: 1
+  image: "mula/server"
+  tag: "latest"
+  pullPolicy: "Always"
+  commitSha: ""
+
+  # Gunicorn UvicornWorkers per pod.
+  # Each worker is a full async event loop that can handle thousands of
+  # concurrent connections (SSE streams are async, not thread-blocking).
+  # Rule of thumb: 2-4 workers per CPU core.
+  gunicornWorkers: 4
+
+  # Redis connection pool per pod.
+  # Must be >= max concurrent SSE streams per pod + headroom for regular ops.
+  # Each SSE stream holds 1 Redis subscription from this pool.
+  # Formula: (expected_concurrent_streams / server_replicas) + 50
+  redisPoolMax: "200"
+
+  resources: {}
+  #  requests:
+  #    cpu: 500m
+  #    memory: 512Mi
+  #  limits:
+  #    cpu: "2"
+  #    memory: 1Gi
+
+  environment: {}
+
+  observability:
+    enabled: false
+    otel:
+      service_name: mula-server
+      exporter_otlp_endpoint: ""
+      auth_token:
+        enabled: false
+        secret_name: "otel-auth-token"
+        secret_key: "token"
+      enable_json_logging: true
+      log_level: INFO
+      logging_auto_instrumentation: true
+
+  probes:
+    enabled: false
+    liveness:
+      path: /api/health/live
+      port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readiness:
+      path: /api/health/ready
+      port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+# ---------------------------------------------------------------------------
+# Worker (Dramatiq) — heavy processing, publishes results to Redis pub/sub
+# ---------------------------------------------------------------------------
+# Uses the SAME Docker image as server, launched with SERVICE=worker.
+# Workers are completely separate pods from the server — they share nothing
+# except Redis (broker + pub/sub) and PostgreSQL.
+#
+# Scaling strategy:
+#   - processes: bypasses Python GIL, each has own memory space
+#     → increase for CPU-bound work (embeddings, text processing)
+#   - threads: I/O concurrency within a process
+#     → increase for I/O-bound work (LLM API calls, S3 uploads, DB queries)
+#   - replicas: more pods via HPA
+#     → increase for overall throughput
+#
+# The math: concurrent_tasks = replicas × processes × threads
+# ---------------------------------------------------------------------------
+worker:
+  enabled: false
+  replicaCount: 1
+  processes: 2
+  threads: 8
+
+  resources: {}
+  #  requests:
+  #    cpu: 500m
+  #    memory: 1Gi
+  #  limits:
+  #    cpu: "2"
+  #    memory: 2Gi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# ---------------------------------------------------------------------------
+# Scheduler — single-instance DB-driven task scheduler
+# ---------------------------------------------------------------------------
+# Uses the SAME Docker image as server/worker, launched with SERVICE=scheduler.
+# Runs a simple loop every tickSeconds:
+#   1. Acquire/renew Redis leader lock
+#   2. SELECT due tasks from scheduler_task (FOR UPDATE SKIP LOCKED)
+#   3. Dispatch Dramatiq messages → workers execute the actual work
+#   4. Update next_run_at
+#
+# Schedules live in PostgreSQL — users and the LLM can create new schedules
+# dynamically via the ScheduledTask model. The scheduler picks them up on
+# the next tick with no restart needed.
+#
+# Always 1 replica. The leader lock prevents duplicate dispatches during
+# rolling updates. If the pod dies, the lock expires in leaderTtlSeconds
+# and a new pod takes over.
+#
+# Extremely lightweight: just a Python loop doing DB reads and Redis writes.
+# ---------------------------------------------------------------------------
+scheduler:
+  enabled: false
+  tickSeconds: 5
+  leaderTtlSeconds: 30
+  resources: {}
+  #  requests:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  limits:
+  #    cpu: 250m
+  #    memory: 256Mi
+  livenessProbe:
+    enabled: false
+
+# ---------------------------------------------------------------------------
+# Client (React SPA served by nginx)
+# ---------------------------------------------------------------------------
+# Frontend calls api.mula.page directly (cross-origin).
+# No /api proxy — CORS is handled by the server ingress annotations
+# and FastAPI middleware.
+# ---------------------------------------------------------------------------
+client:
+  hostname: ""
+  replicaCount: 1
+  image: "mula/client"
+  tag: "latest"
+  pullPolicy: "Always"
+  commitSha: ""
+
+  resources: {}
+
+# ---------------------------------------------------------------------------
+# MinIO (in-cluster upload buffer → streams to external S3)
+# ---------------------------------------------------------------------------
+minio:
+  enabled: true
+  image: "minio/minio:latest"
+  pullPolicy: "IfNotPresent"
+
+  resources: {}
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 20Gi
+    accessMode: ReadWriteOnce
+
+  auth:
+    secretName: "minio-auth"
+    accessKeyRef: "access-key"
+    secretKeyRef: "secret-key"
+
+# ---------------------------------------------------------------------------
+# Queue broker
+# ---------------------------------------------------------------------------
+queue:
+  enabled: false
+  type: redis

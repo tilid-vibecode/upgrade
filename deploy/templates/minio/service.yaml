@@ -1,0 +1,23 @@
+{{- if .Values.minio.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-minio
+  labels:
+    app.kubernetes.io/name: mula-minio
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: mula-ai
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mula-minio
+  ports:
+    - port: 9000
+      name: api
+      targetPort: 9000
+    - port: 9001
+      name: console
+      targetPort: 9001
+{{- end }}

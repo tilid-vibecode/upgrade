@@ -1,0 +1,116 @@
+environment: production
+
+# ---------------------------------------------------------------------------
+# PRODUCTION CAPACITY PLANNING
+# ---------------------------------------------------------------------------
+#
+# Server pods hold SSE streams. Each pod with 4 UvicornWorkers can handle
+# thousands of concurrent async connections. The bottleneck is Redis pool
+# size (1 subscription per SSE stream) and memory.
+#
+# Worker pods do the heavy lifting. Most chat processing involves:
+#   - LLM API calls (I/O wait, 1-30s per call)
+#   - Embedding generation (I/O wait)
+#   - DB reads/writes (I/O wait)
+#   - Text processing (CPU)
+#
+# Balance ratio: workers should significantly outnumber server pods.
+# Server pods: 2-3 (hold connections, lightweight)
+# Worker pods: 5-20 (do actual processing, scale with load)
+#
+# Concurrent task capacity:
+#   Base:  5 pods × 4 procs × 8 threads = 160 concurrent tasks
+#   Max:  20 pods × 4 procs × 8 threads = 640 concurrent tasks
+#
+# SSE stream capacity:
+#   3 pods × 300 pool = 900 concurrent streams (minus ~50/pod for operations)
+#   → ~750 concurrent chat streams
+#
+# Scheduler: 1 pod, always. Uses ~10MB RAM and negligible CPU.
+# It just reads due rows from PostgreSQL and sends Redis messages.
+# ---------------------------------------------------------------------------
+
+server:
+  hostname: "api.mula.page"
+  pullPolicy: "IfNotPresent"
+  replicaCount: 3
+  gunicornWorkers: 4
+  redisPoolMax: "300"
+  environment:
+    SENTRY_TRACES_SAMPLE_RATE: "0.2"
+    SENTRY_PROFILES_SAMPLE_RATE: "0.2"
+  observability:
+    enabled: true
+    otel:
+      auth_token:
+        enabled: true
+  probes:
+    enabled: true
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+
+worker:
+  enabled: true
+  replicaCount: 5
+  processes: 4
+  threads: 8
+  resources:
+    requests:
+      cpu: "1"
+      memory: 2Gi
+    limits:
+      cpu: "4"
+      memory: 4Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 75
+
+scheduler:
+  enabled: true
+  tickSeconds: 5
+  leaderTtlSeconds: 30
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  livenessProbe:
+    enabled: true
+
+client:
+  hostname: "mula.page"
+  pullPolicy: "IfNotPresent"
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+minio:
+  enabled: true
+  persistence:
+    size: 100Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+
+queue:
+  enabled: true
+  type: redis

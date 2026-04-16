@@ -1,0 +1,19 @@
+{
+  "version": "2026-03-26.v1",
+  "provider": "gitlab_handbook",
+  "notes": "Checked-in public handbook seeds. Keep a mix of family index pages and a few stable leaf pages so role-library sync still finds useful content when one public route changes or section discovery becomes brittle.",
+  "base_urls": [
+    "https://handbook.gitlab.com/job-description-library/",
+    "https://handbook.gitlab.com/job-description-library/engineering/",
+    "https://handbook.gitlab.com/job-description-library/engineering/backend-engineer/",
+    "https://handbook.gitlab.com/job-description-library/engineering/frontend-engineer/",
+    "https://handbook.gitlab.com/job-description-library/product/",
+    "https://handbook.gitlab.com/job-description-library/product/product-manager/",
+    "https://handbook.gitlab.com/job-description-library/product/product-management-leadership/",
+    "https://handbook.gitlab.com/job-description-library/design/",
+    "https://handbook.gitlab.com/job-description-library/data/",
+    "https://handbook.gitlab.com/job-description-library/marketing/",
+    "https://handbook.gitlab.com/job-description-library/sales/",
+    "https://handbook.gitlab.com/job-description-library/chief-executive-officer/"
+  ]
+}

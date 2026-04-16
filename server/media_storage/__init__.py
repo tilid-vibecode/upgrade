@@ -1,0 +1,1 @@
+# File location: /server/media_storage/__init__.py

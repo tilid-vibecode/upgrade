@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-client
+spec:
+  replicas: {{ .Values.client.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mula-client
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mula-client
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/part-of: mula-ai
+        app.kubernetes.io/component: client
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: {{ .Values.client.tag | quote }}
+      annotations:
+        deploy/tag: {{ .Values.client.tag | quote }}
+        deploy/commit: {{ default "" .Values.client.commitSha | quote }}
+    spec:
+      {{- if eq .Values.environment "staging" }}
+      tolerations:
+        - key: "eks.amazonaws.com/capacityType"
+          operator: "Equal"
+          value: "SPOT"
+          effect: "NoSchedule"
+      {{- end }}
+      containers:
+        - name: client
+          image: "{{ .Values.registry }}/{{ .Values.client.image }}:{{ .Values.client.tag }}"
+          imagePullPolicy: {{ .Values.client.pullPolicy }}
+          ports:
+            - containerPort: 3000
+              name: http
+          {{- with .Values.client.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
